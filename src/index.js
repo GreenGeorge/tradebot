@@ -38,7 +38,7 @@ const sellBTC = (amount, price) => {
   console.log(`sold ${toBTC(BTCSold)}`);
 };
 
-const getCurrentPrice = async () => {
+const trade = async () => {
   try {
     const data = await getTicker();
     const currentPrice = parseInt(data.ticker.last, 10);
@@ -66,4 +66,4 @@ const getCurrentPrice = async () => {
   }
 };
 
-setInterval(getCurrentPrice, interval);
+setInterval(trade, interval);
