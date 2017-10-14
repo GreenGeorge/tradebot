@@ -6,6 +6,8 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "eslint": "^4.8.0",
@@ -21,10 +23,11 @@
     "crypto": "^1.0.1",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
-    "query-string": "^5.0.0"
+    "query-string": "^5.0.0",
+    "babel-polyfill": "^6.26.0"
   },
   "scripts": {
-    "start": "webpack -w & nodemon ./dist/index.js",
+    "start": "webpack -w & nodemon dist/server.js",
     "build": "webpack -p",
     "test": "tape -r babel-register tests/**/*.js",
     "lint": "eslint './src/**/*.js' './tests/**/*.js'"

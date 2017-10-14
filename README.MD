@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/GreenGeorge/tradebot.svg?style=svg)](https://circleci.com/gh/GreenGeorge/tradebot)
+[![CircleCI](https://circleci.com/gh/GreenGeorge/tradebot.svg?style=shield)](https://circleci.com/gh/GreenGeorge/tradebot)
 
 # TRADEBOT
 
