@@ -24,7 +24,7 @@
     "query-string": "^5.0.0"
   },
   "scripts": {
-    "start": "webpack -w & nodemon ./dist/index.js",
+    "start": "webpack -w & nodemon dist/server.js",
     "build": "webpack -p",
     "test": "tape -r babel-register tests/**/*.js",
     "lint": "eslint './src/**/*.js' './tests/**/*.js'"
