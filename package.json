@@ -20,11 +20,12 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "babel-polyfill": "^6.26.0",
     "crypto": "^1.0.1",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
-    "query-string": "^5.0.0",
-    "babel-polyfill": "^6.26.0"
+    "numeral": "^2.0.6",
+    "query-string": "^5.0.0"
   },
   "scripts": {
     "start": "webpack -w & nodemon dist/server.js",
