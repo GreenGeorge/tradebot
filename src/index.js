@@ -1,7 +1,8 @@
 import 'babel-polyfill';
-import numeral from 'numeral';
-import { getTicker } from './methods/requests';
+import colors from 'colors';
 
+import { getTicker } from './methods/requests';
+import { toIDR, toPercentage, toBTC } from './utils/numbers';
 
 const state = {
   balance: 0,
@@ -11,24 +12,30 @@ const state = {
 };
 const money = 100000;
 const margin = 0.05 / 100;
+const interval = 2500;
 
-console.log('Tradebot started');
-console.log(`Starting money ${numeral(money).format('0,0')}`);
-console.log(`Target margin ${numeral(margin).format('0.000%')}`);
-console.log(`Potential profit ${numeral(money * margin).format('0,0')}`);
+console.log(`
+-----------------------------------------------
+Tradebot Started
+Starting money ${toIDR(money)}
+Trade interval ${interval} ms
+Target margin ${toPercentage(margin)}
+Potential profit ${toIDR(money * margin)}
+-----------------------------------------------
+`.yellow);
 
 const buyBTC = (amount, price) => {
   const BTCBought = amount / price;
   state.balance += BTCBought;
   state.boughtAt = price;
-  console.log(`bought ${BTCBought}`);
+  console.log(`bought ${toBTC(BTCBought)} at ${toIDR(price)}`);
 };
 
 const sellBTC = (amount, price) => {
   const BTCSold = amount / price;
   state.balance -= BTCSold;
   state.lastSoldAt = price;
-  console.log(`sold ${BTCSold}`);
+  console.log(`sold ${toBTC(BTCSold)}`);
 };
 
 const getCurrentPrice = async () => {
@@ -42,13 +49,21 @@ const getCurrentPrice = async () => {
 
     if (priceChanged) {
       state.lastPrice = currentPrice;
-      console.log(numeral(currentPrice).format('0.0'), state);
+      console.log(colors.red(toIDR(currentPrice)), state);
     }
-    if (outside) buyBTC(money, currentPrice);
-    if (!outside && aboveMargin) sellBTC(state.balance, currentPrice);
+
+    if (outside) {
+      buyBTC(money, currentPrice);
+      console.log(colors.red(toIDR(currentPrice)), state);
+    }
+
+    if (!outside && aboveMargin) {
+      console.log(`Above margin! selling ${toBTC(state.balance)} at ${toIDR(currentPrice)}`);
+      sellBTC(state.balance, currentPrice);
+    }
   } catch (error) {
     console.error(error);
   }
 };
 
-setInterval(getCurrentPrice, 2500);
+setInterval(getCurrentPrice, interval);
