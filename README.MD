@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/GreenGeorge/tradebot.svg?style=svg)](https://circleci.com/gh/GreenGeorge/tradebot)
+
 # TRADEBOT
 
 Node server to trade Bitcoin or other cryptocurrencies on the bitcoin.co.id exchange through its API. Made for learning purposes.

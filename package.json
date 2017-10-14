@@ -4,22 +4,28 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "eslint": "^4.8.0",
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-plugin-import": "^2.7.0",
     "faucet": "^0.0.1",
-    "tape": "^4.8.0"
+    "nodemon": "^1.12.1",
+    "tape": "^4.8.0",
+    "webpack": "^3.7.1"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "crypto": "^1.0.1",
     "dotenv": "^4.0.0",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "query-string": "^5.0.0"
   },
   "scripts": {
-    "build": "babel ./src/index.js -o ./dist/index.js",
+    "start": "webpack -w & nodemon ./dist/index.js",
+    "build": "webpack -p",
     "test": "tape -r babel-register tests/**/*.js",
     "lint": "eslint './src/**/*.js' './tests/**/*.js'"
   }
