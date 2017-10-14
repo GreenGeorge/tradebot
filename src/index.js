@@ -31,11 +31,10 @@ const buyBTC = (amount, price) => {
   console.log(`bought ${toBTC(BTCBought)} at ${toIDR(price)}`);
 };
 
-const sellBTC = (amount, price) => {
-  const BTCSold = amount / price;
-  state.balance -= BTCSold;
+const sellBTC = (BTCamount, price) => {
+  state.balance -= BTCamount;
   state.lastSoldAt = price;
-  console.log(`sold ${toBTC(BTCSold)}`);
+  console.log(`sold ${toBTC(BTCamount)} at ${toIDR(price)}`);
 };
 
 const trade = async () => {
