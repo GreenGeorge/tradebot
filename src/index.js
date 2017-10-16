@@ -1,22 +1,37 @@
 import 'babel-polyfill';
 import colors from 'colors';
+import moment from 'moment';
+import fs from 'fs';
 
 import { getTicker } from './methods/requests';
 import { toIDR, toPercentage, toBTC } from './utils/numbers';
 
-// Create an object to hold the state
+colors.setTheme({
+  up: 'green',
+  down: 'red',
+  equal: 'yellow',
+});
+
+const ledger = [{
+  time: (new Date()).getTime(),
+  bought: null,
+  sold: null,
+  price: null,
+}];
+
 const state = {
-  balance: 0,
-  boughtAt: 0,
-  lastSoldAt: 0,
   lastPrice: 0,
 };
+
 // Set cap for money to trade
 const money = 100000;
 // Set intended return
 const margin = 0.05 / 100;
 // Set time between trades
 const interval = 2500;
+
+const timestamp = (new Date()).getTime();
+const formattedTimestamp = moment(timestamp).format('MMMM Do YYYY, h:mm:ss a');
 
 // Output a header
 console.log(`
@@ -29,26 +44,34 @@ Potential profit ${toIDR(money * margin)}
 -----------------------------------------------
 `.yellow);
 
+fs.writeFile('trans.log', `Tradebot started ${formattedTimestamp}\n`, () => console.log(formattedTimestamp));
+
 // Function to buy BTC
 const buyBTC = (amount, price) => {
   // Get the amount of BTC to buy
   const BTCBought = amount / price;
-  // Add to the balance
-  state.balance += BTCBought;
-  // Set the price / value of the balance
-  state.boughtAt = price;
+  const transaction = {
+    time: (new Date()).getTime(),
+    bought: BTCBought,
+    price,
+  };
+  ledger.push(transaction);
   // Output the details of the transaction
-  console.log(`bought ${toBTC(BTCBought)} at ${toIDR(price)}`);
+  console.log(`bought ${toBTC(BTCBought)} at ${toIDR(price)}`.up);
+  fs.appendFile('trans.log', `bought ${toBTC(BTCBought)} at ${toIDR(price)}\n`, () => console.log('logged'));
 };
 
 // Function to sell BTC
 const sellBTC = (BTCamount, price) => {
-  // Reduce the balance
-  state.balance -= BTCamount;
-  // Set the price / value of the balance sold
-  state.lastSoldAt = price;
+  const transaction = {
+    time: (new Date()).getTime(),
+    sold: BTCamount,
+    price,
+  };
+  ledger.push(transaction);
   // Output the details of the transaction
-  console.log(`sold ${toBTC(BTCamount)} at ${toIDR(price)}`);
+  console.log(`sold ${toBTC(BTCamount)} at ${toIDR(price)}`.green);
+  fs.appendFile('trans.log', `sold ${toBTC(BTCamount)} at ${toIDR(price)}\n`, () => console.log('logged'));
 };
 
 // Function to check API and decide on action to achieve margin target
@@ -58,37 +81,34 @@ const trade = async () => {
     const data = await getTicker();
     // Get the current price
     const currentPrice = parseInt(data.ticker.last, 10);
-    // Get the target price based on set margin
-    const targetPrice = state.boughtAt * (1 + margin);
-    // Check if price has changed since last loop
-    const priceChanged = currentPrice !== state.lastPrice;
-    // Check if no BTC is in the balance
-    const outside = state.balance === 0;
-    // Check if the current price is above the set margin
-    const aboveMargin = (currentPrice - targetPrice) > 0;
+    const { lastPrice } = state;
+    const priceDifference = lastPrice - currentPrice;
 
-    // If price has changed
-    if (priceChanged) {
-      // Set the price in the state object
+    let priceDirection;
+    if (priceDifference < 0) {
+      priceDirection = 'up';
+    } else if (priceDifference > 0) {
+      priceDirection = 'down';
+    }
+
+    if (priceDifference !== 0) {
+      const priceChangeFraction = Math.abs(priceDifference / lastPrice);
+      const changePercentage = toPercentage(priceChangeFraction);
+
+      if (priceChangeFraction > margin && !ledger[ledger.length - 1].bought) {
+        buyBTC(money, currentPrice);
+      }
+
+      if (priceDirection === 'down' && priceChangeFraction > margin && ledger[ledger.length - 1].bought) {
+        sellBTC(ledger[ledger.length - 1].bought, currentPrice);
+      }
+
+      console.log(
+        toIDR(currentPrice)[priceDirection],
+        changePercentage[priceDirection],
+      );
+
       state.lastPrice = currentPrice;
-      // Output the new price
-      console.log(colors.red(toIDR(currentPrice)), state);
-    }
-
-    // If no BTC is in the balance
-    if (outside) {
-      // Buy BTC at current price
-      buyBTC(money, currentPrice);
-      // Output the transaction details
-      console.log(colors.red(toIDR(currentPrice)), state);
-    }
-
-    // If BTC is in balance and current price is above the set margin
-    if (!outside && aboveMargin) {
-      console.log(`Above margin! selling ${toBTC(state.balance)} at
-       ${toIDR(currentPrice)}`);
-      // Sell BTC at current price
-      sellBTC(state.balance, currentPrice);
     }
   } catch (error) {
     // Output the error
