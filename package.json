@@ -6,6 +6,8 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.26.0",
     "eslint": "^4.8.0",
@@ -13,20 +15,26 @@
     "eslint-plugin-import": "^2.7.0",
     "faucet": "^0.0.1",
     "nodemon": "^1.12.1",
+    "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
+    "tape-watch": "^2.3.0",
     "webpack": "^3.7.1"
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "babel-polyfill": "^6.26.0",
+    "colors": "^1.1.2",
     "crypto": "^1.0.1",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
+    "moment": "^2.19.1",
+    "numeral": "^2.0.6",
     "query-string": "^5.0.0"
   },
   "scripts": {
-    "start": "webpack -w & nodemon ./dist/index.js",
+    "start": "webpack -w & nodemon dist/server.js",
     "build": "webpack -p",
-    "test": "tape -r babel-register tests/**/*.js",
+    "test": "tape-watch -r babel-register -w -c tests/**/*.js -p tap-spec",
     "lint": "eslint './src/**/*.js' './tests/**/*.js'"
   }
 }
